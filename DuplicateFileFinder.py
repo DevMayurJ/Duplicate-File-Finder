@@ -46,19 +46,28 @@ def PrintDuplicate(dict1):
 
         print ("The following are identical files.")
 
-        icnt = 0
         for result in results:
             for subresult in result:
-                icnt+=1
-                if icnt >= 2:
-                    print ("\t\t%s" % subresult)
+                print ("\t\t%s" % subresult)
+            print ("-------------------------------------------------------------------------")
     else:
         print("No dulplicate files found")
 
 
+def DisplayHelp():
+    print ("This script List all duplicate files from provided directory path")
+    print ("python.exe .\DuplicateFileFinder.py <Directory>")
+    print ("e.g python.exe .\DuplicateFileFinder.py F:\\Users\DevMJ\\")
+
 def main():
     if len(argv) != 2:
         print ("ERROR! Invalid arguments")
+        DisplayHelp()
+        return
+    
+    if (argv[1] == "-h") or (argv[1] == "-H"):
+        DisplayHelp()
+        return
 
     try:
         arr = {}
