@@ -21,9 +21,15 @@
     <ClCompile Include="CheckSum.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CheckSum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DuplicateFileFinder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

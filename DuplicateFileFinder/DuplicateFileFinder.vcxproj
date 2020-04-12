@@ -157,9 +157,11 @@
   <ItemGroup>
     <ClCompile Include="CheckSum.cpp" />
     <ClCompile Include="DuplicateFileFinder.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CheckSum.h" />
+    <ClInclude Include="DuplicateFileFinder.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
