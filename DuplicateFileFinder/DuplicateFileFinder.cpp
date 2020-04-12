@@ -11,20 +11,23 @@ using namespace std;
 #define MAX_PATH_LENGTH 1024
 #define MAX_CHECKSUM_LENGTH 40
 
-void DuplicateFileFinder::AddNewEntry(TCHAR *pszFilePath)
+void DuplicateFileFinder::AddNewEntry(const TCHAR *pcszFilePath)
 {
 	TCHAR szChecksum[MAX_CHECKSUM_LENGTH];
-	CalclulateChecksum(pszFilePath, szChecksum);
-	auto it = mDuplicateFileList.find(STRING(szChecksum));
+	CalclulateChecksum(pcszFilePath, szChecksum);
+	STRING strCheckSum(szChecksum);
+	STRING strFilePath(pcszFilePath);
+
+	auto it = mDuplicateFileList.find(strCheckSum);
 	if (it == mDuplicateFileList.end())
 	{
 		vector<STRING> vctTemp;
-		vctTemp.push_back(STRING(pszFilePath));
-		mDuplicateFileList[STRING(szChecksum)] = vctTemp;
+		vctTemp.push_back(strFilePath);
+		mDuplicateFileList[strCheckSum] = vctTemp;
 	}
 	else
 	{
-		it->second.push_back(STRING(pszFilePath));
+		it->second.push_back(strFilePath);
 	}
 }
 

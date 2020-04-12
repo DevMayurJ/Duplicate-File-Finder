@@ -15,7 +15,7 @@ typedef std::string STRING;
 class DuplicateFileFinder
 {
 	std::map<STRING, std::vector<STRING>> mDuplicateFileList;
-	void AddNewEntry(TCHAR *pszFilePath);
+	void AddNewEntry(const TCHAR *pcszFilePath);
 public:
 	void FindFilesRecursively(LPCTSTR lpFolder, LPCTSTR lpFilePattern);
 	void Display_Duplicate_Files();

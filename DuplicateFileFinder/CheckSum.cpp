@@ -6,7 +6,7 @@
 #define BUFSIZE 1024
 #define MD5LEN  16
 
-DWORD CalclulateChecksum(TCHAR *pszFilePath,TCHAR *pszCheckSum)
+DWORD CalclulateChecksum(const TCHAR *pcszFilePath,TCHAR *pszCheckSum)
 {
 	DWORD dwStatus = 0;
 	BOOL bResult = FALSE;
@@ -20,7 +20,7 @@ DWORD CalclulateChecksum(TCHAR *pszFilePath,TCHAR *pszCheckSum)
 	CHAR rgbDigits[] = "0123456789abcdef";
 	// Logic to check usage goes here.
 
-	hFile = CreateFile(pszFilePath,
+	hFile = CreateFile(pcszFilePath,
 		GENERIC_READ,
 		FILE_SHARE_READ,
 		NULL,
@@ -31,7 +31,7 @@ DWORD CalclulateChecksum(TCHAR *pszFilePath,TCHAR *pszCheckSum)
 	if (INVALID_HANDLE_VALUE == hFile)
 	{
 		dwStatus = GetLastError();
-		_tprintf(_T("Error opening file %s\nError: %d\n"), pszFilePath, dwStatus);
+		_tprintf(_T("Error opening file %s\nError: %d\n"), pcszFilePath, dwStatus);
 		return dwStatus;
 	}
 
