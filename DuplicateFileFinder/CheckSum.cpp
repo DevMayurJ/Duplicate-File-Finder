@@ -31,8 +31,7 @@ DWORD CalclulateChecksum(TCHAR *pszFilePath,TCHAR *pszCheckSum)
 	if (INVALID_HANDLE_VALUE == hFile)
 	{
 		dwStatus = GetLastError();
-		printf("Error opening file %s\nError: %d\n", pszFilePath,
-			dwStatus);
+		_tprintf(_T("Error opening file %s\nError: %d\n"), pszFilePath, dwStatus);
 		return dwStatus;
 	}
 
@@ -44,7 +43,7 @@ DWORD CalclulateChecksum(TCHAR *pszFilePath,TCHAR *pszCheckSum)
 		CRYPT_VERIFYCONTEXT))
 	{
 		dwStatus = GetLastError();
-		printf("CryptAcquireContext failed: %d\n", dwStatus);
+		_tprintf(_T("CryptAcquireContext failed: %d\n"), dwStatus);
 		CloseHandle(hFile);
 		return dwStatus;
 	}
@@ -52,7 +51,7 @@ DWORD CalclulateChecksum(TCHAR *pszFilePath,TCHAR *pszCheckSum)
 	if (!CryptCreateHash(hProv, CALG_MD5, 0, 0, &hHash))
 	{
 		dwStatus = GetLastError();
-		printf("CryptAcquireContext failed: %d\n", dwStatus);
+		_tprintf(_T("CryptAcquireContext failed: %d\n"), dwStatus);
 		CloseHandle(hFile);
 		CryptReleaseContext(hProv, 0);
 		return dwStatus;
@@ -69,7 +68,7 @@ DWORD CalclulateChecksum(TCHAR *pszFilePath,TCHAR *pszCheckSum)
 		if (!CryptHashData(hHash, rgbFile, cbRead, 0))
 		{
 			dwStatus = GetLastError();
-			printf("CryptHashData failed: %d\n", dwStatus);
+			_tprintf(_T("CryptHashData failed: %d\n"), dwStatus);
 			CryptReleaseContext(hProv, 0);
 			CryptDestroyHash(hHash);
 			CloseHandle(hFile);
@@ -80,7 +79,7 @@ DWORD CalclulateChecksum(TCHAR *pszFilePath,TCHAR *pszCheckSum)
 	if (!bResult)
 	{
 		dwStatus = GetLastError();
-		printf("ReadFile failed: %d\n", dwStatus);
+		_tprintf(_T("ReadFile failed: %d\n"), dwStatus);
 		CryptReleaseContext(hProv, 0);
 		CryptDestroyHash(hHash);
 		CloseHandle(hFile);
@@ -109,7 +108,7 @@ DWORD CalclulateChecksum(TCHAR *pszFilePath,TCHAR *pszCheckSum)
 	else
 	{
 		dwStatus = GetLastError();
-		printf("CryptGetHashParam failed: %d\n", dwStatus);
+		_tprintf(_T("CryptGetHashParam failed: %d\n"), dwStatus);
 	}
 
 	CryptDestroyHash(hHash);
