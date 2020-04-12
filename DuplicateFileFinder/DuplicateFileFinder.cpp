@@ -18,65 +18,32 @@ typedef wstring STRING;
 typedef string STRING;
 #endif
 
-#define NODE (filell*)malloc(sizeof(filell))
 #define MAX_PATH_LENGTH 1024
+#define MAX_CHECKSUM_LENGTH 40
 
-typedef struct filell
+void AddNewEntry(map<STRING, vector<STRING>> &mDuplicateFileList, TCHAR *pszFilePath)
 {
-	TCHAR *fpath;
-	TCHAR *fname;
-	//STRING strName;
-	long fsize;
-	struct filell *next;
-}fll;
-
-static fll*head = NULL;              /*Text File Linked List Head*/
-
-void Create_File_List(fll**head, TCHAR*fpath1, TCHAR *fname1, long fsize1)
-{
-	fll*newnode = NODE;
-	int iLen = 0;
-
-	iLen = (_tcslen(fname1) + 1) * sizeof(TCHAR);
-	newnode->fname = (TCHAR*)malloc(iLen);
-	_tcscpy(newnode->fname, fname1);
-	//newnode->strName = fname1;
-
-	iLen = (_tcslen(fpath1) + 1) * sizeof(TCHAR);
-	newnode->fpath = (TCHAR*)malloc(iLen);
-	_tcscpy(newnode->fpath, fpath1);
-	//newnode->fpath = fpath1;
-	newnode->fsize = fsize1;
-	newnode->next = NULL;
-	if (*head == NULL) 
+	TCHAR szChecksum[MAX_CHECKSUM_LENGTH];
+	CalclulateChecksum(pszFilePath, szChecksum);
+	auto it = mDuplicateFileList.find(STRING(szChecksum));
+	if (it == mDuplicateFileList.end())
 	{
-		*head = newnode;
+		vector<STRING> vctTemp;
+		vctTemp.push_back(STRING(pszFilePath));
+		mDuplicateFileList[STRING(szChecksum)] = vctTemp;
 	}
-	else 
+	else
 	{
-		fll*prev = NULL, *temp = NULL;
-		for (temp = prev = *head; temp != NULL && temp->fsize < newnode->fsize; prev = temp, temp = temp->next);
-
-		if (temp == *head) 
-		{
-			newnode->next = *head;
-			*head = newnode;
-		}
-		else 
-		{
-			newnode->next = temp;
-			prev->next = newnode;
-		}
+		it->second.push_back(STRING(pszFilePath));
 	}
-}//create()
-//---------------------------------------------------------------------------
+}
 
-
-void FindFilesRecursively(LPCTSTR lpFolder, LPCTSTR lpFilePattern)
+void FindFilesRecursively(LPCTSTR lpFolder, map<STRING, vector<STRING>> &mDuplicateFileList, LPCTSTR lpFilePattern)
 {
 	HANDLE hFindFile;
 	TCHAR szFullPattern[MAX_PATH];
 	WIN32_FIND_DATA FindFileData;
+
 	// first we are going to process any subdirectories
 	PathCombine(szFullPattern, lpFolder, _T("*"));
 	hFindFile = FindFirstFile(szFullPattern, &FindFileData);
@@ -93,54 +60,27 @@ void FindFilesRecursively(LPCTSTR lpFolder, LPCTSTR lpFilePattern)
 			{
 				// found a subdirectory; recurse into it
 				PathCombine(szFullPattern, lpFolder, FindFileData.cFileName);
-				FindFilesRecursively(szFullPattern, lpFilePattern);
+				FindFilesRecursively(szFullPattern, mDuplicateFileList, lpFilePattern);
 			}
 			else
 			{
 
-				TCHAR szFullPath[1024];
-				_tcscpy(szFullPath, lpFolder);
-				_tcscat(szFullPath, _T("\\"));
-				_tcscat(szFullPath, FindFileData.cFileName);
-				Create_File_List(&head, (TCHAR *)lpFolder, FindFileData.cFileName, FindFileData.nFileSizeLow);
+				TCHAR szFullPath[MAX_PATH_LENGTH];
+				PathCombine(szFullPath, lpFolder, FindFileData.cFileName);
+				AddNewEntry(mDuplicateFileList, szFullPath);
 			}
 
 		} while (FindNextFile(hFindFile, &FindFileData));
+
 		FindClose(hFindFile);
 	}
 }
 
-void Display_Duplicate_Files(fll**head)
+
+void Display_Duplicate_Files(const map<STRING, vector<STRING>> &mDuplicateFileList)
 {
-	map<STRING, vector<STRING>> mDuplicateFileList;
-
-	if (*head)
+	if (!mDuplicateFileList.empty())
 	{
-		fll*temp = *head;
-		while (temp != NULL)
-		{
-			TCHAR szFilePath[2048];
-			TCHAR szChecksum[40];
-			_tcscpy(szFilePath, temp->fpath);
-			_tcscat(szFilePath, _T("\\"));
-			_tcscat(szFilePath, temp->fname);
-			CalclulateChecksum(szFilePath, szChecksum);
-			//_tprintf(_T("FILE=%s\\%-40s SIZE=%10ld Bytes Checksum %s \n"), temp->fpath, temp->fname, temp->fsize, szChecksum);
-			temp = temp->next;
-
-			auto it = mDuplicateFileList.find(STRING(szChecksum));
-			if (it == mDuplicateFileList.end())
-			{
-				vector<STRING> vctTemp;
-				vctTemp.push_back(STRING(szFilePath));
-				mDuplicateFileList[STRING(szChecksum)] = vctTemp;
-			}
-			else
-			{
-				it->second.push_back(STRING(szFilePath));
-			}
-		}
-
 		printf("\n");
 		for (auto it : mDuplicateFileList)
 		{
@@ -157,18 +97,21 @@ void Display_Duplicate_Files(fll**head)
 		}
 	}
 	else
-		printf("File List is Empty\n");
+	{
+		_tprintf(_T("File List is Empty\n"));
+	}
 }
 
 int main(int argc,TCHAR *argv)
 {
-	TCHAR szPath[2048];
+	map<STRING, vector<STRING>> mDuplicateFileList;
+	TCHAR szPath[2048]; //= _T("D:\\MayurJ\\DFF_Test");
     std::cout << "-------Duplicate File Finder--------------------!\n";
 	_tprintf(_T("\nEnter Directory path:- "));
 	_tscanf(_T("%s"), szPath);
 	
-	FindFilesRecursively(szPath, _T("*.txt"));
-	Display_Duplicate_Files(&head);
+	FindFilesRecursively(szPath, mDuplicateFileList, _T("*.txt"));
+	Display_Duplicate_Files(mDuplicateFileList);
 	return 0;
 }
 
